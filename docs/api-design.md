@@ -1,10 +1,10 @@
 # API DESIGN
 
-## Auth
+## User
 
 - ### Register
 
-Endpoint : POST /api/auth
+Endpoint : POST /api/users/register
 
 Request :
 
@@ -35,7 +35,7 @@ Response (409 Conflict):
 
 - ### Login
 
-Endpoint : POST /api/auth/login
+Endpoint : POST /api/users/login
 
 Request :
 
@@ -62,6 +62,70 @@ Response (401 Unauthorized):
   "message": "Invalid email or password"
 }
 
+```
+
+- ### Get User
+
+EndPoint : GET /api/users/me
+
+Authentication : Bearer JWT
+
+Response (200 OK):
+
+```json
+{
+  "id": "uuid",
+  "email": "example@gmail.com",
+  "name": "your name",
+  "role": "MAHASISWA",
+  "createdAt": "2026-07-01T08:00:00Z"
+}
+```
+
+- ### Update User
+
+EndPoint : PATCH /api/users/me
+
+Authentication : Bearer JWT
+
+Request:
+```json
+{
+  "name": "new name",
+  "email": "newemail@gmail.com",
+  "password": "newpassword"
+}
+```
+
+Response (200 OK):
+```json
+{
+  "id": "uuid",
+  "email": "newemail@gmail.com",
+  "name": "new name",
+  "role": "MAHASISWA",
+  "updatedAt": "2026-07-01T09:00:00Z"
+}
+```
+
+Response (409 Conflict):
+```json
+{
+  "message": "Email already registered"
+}
+```
+
+- ### Delete User
+
+EndPoint : DELETE /api/users/me
+
+Authentication : Bearer JWT
+
+Response (200 OK):
+```json
+{
+  "message": "Account deleted successfully"
+}
 ```
 
 ## Asset
