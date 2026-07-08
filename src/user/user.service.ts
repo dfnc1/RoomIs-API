@@ -4,9 +4,9 @@ import {
   AuthResponseDto,
   LoginDto,
   RegisterDto,
+  UpdateUserDto,
   UserResponseDto,
 } from './dto/user.dto';
-import { User } from '../../generated/prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
@@ -57,7 +57,7 @@ export class UserService {
     });
   }
 
-  async update(id: string, request: RegisterDto): Promise<UserResponseDto> {
+  async update(id: string, request: UpdateUserDto): Promise<UserResponseDto> {
     const user: UserResponseDto = await this.get({ email: request.email });
     if (user) throw new HttpException('Email already exist', 409);
     return await this.prismaService.user.update({
@@ -66,11 +66,14 @@ export class UserService {
     });
   }
 
-  async delete(id: string): Promise<UserResponseDto> {
+  async delete(id: string): Promise<{ message: string }> {
     const user: UserResponseDto = await this.get({ id: id });
     if (!user) throw new HttpException('User does not exist', 409);
-    return await this.prismaService.user.delete({
+    await this.prismaService.user.delete({
       where: { id: id },
     });
+    return {
+      message: 'Account deleted successfully',
+    };
   }
 }
