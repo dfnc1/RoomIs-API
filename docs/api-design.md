@@ -91,9 +91,9 @@ Authentication : Bearer JWT
 Request:
 ```json
 {
-  "name": "new name",
-  "email": "newemail@gmail.com",
-  "password": "newpassword"
+  "name": "new name", //optional
+  "email": "newemail@gmail.com", //optional
+  "password": "newpassword" //optional
 }
 ```
 
@@ -211,9 +211,9 @@ Request:
 
 ```json
 {
-  "name": "Proyektor Sony Updated",
-  "description": "Portable HD projector",
-  "category": "ITEM"
+  "name": "Proyektor Sony Updated", //optional
+  "description": "Portable HD projector", //optional
+  "category": "ITEM"  //optional
 }
 ```
 
@@ -355,7 +355,7 @@ Response (200 OK):
 
 
 ### Update Booking Status
-Endpoint : GET /api/bookings/:id/status
+Endpoint : PATCH /api/bookings/:id/status
 
 Authentication : Bearer JWT
 
@@ -370,7 +370,7 @@ Request (reject):
 ```json
 {
 "status": "REJECTED",
-"rejectionReason": "Room under maintenance"
+"rejectionReason": "Room under maintenance" //optional
 }
 ```
 
@@ -383,7 +383,7 @@ Response (200 OK):
 }
 ```
 
-Response (404 Unauthorized):
+Response (404 Not Found):
 ```json
 {
 "message": "Booking not found"
