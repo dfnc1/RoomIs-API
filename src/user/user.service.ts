@@ -1,14 +1,15 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import {
-  AuthResponseDto,
+  AuthResponse,
   LoginDto,
   RegisterDto,
   UpdateUserDto,
-  UserResponseDto,
+  UserResponse,
 } from './dto/user.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { User } from '../../generated/prisma/client';
 
 @Injectable()
 export class UserService {
@@ -17,58 +18,72 @@ export class UserService {
     private jwtService: JwtService,
   ) {}
 
-  async register(request: RegisterDto): Promise<AuthResponseDto> {
-    let user: UserResponseDto = await this.get({ email: request.email });
+  async register(request: RegisterDto): Promise<AuthResponse> {
+    const user: User | null = await this.prismaService.user.findUnique({
+      where: { email: request.email },
+    });
     if (user) throw new HttpException('Email already exist', 409);
-    user = await this.create(user);
-    return await this.generateToken(user);
+    return await this.generateToken(await this.create(request));
   }
 
-  async login(request: LoginDto): Promise<AuthResponseDto> {
-    const user: UserResponseDto = await this.get({ email: request.email });
+  async login(request: LoginDto): Promise<AuthResponse> {
+    const user: User | null = await this.prismaService.user.findUnique({
+      where: { email: request.email },
+    });
+    if (!user) throw new HttpException('Invalid email or password', 401);
     const isMatch: boolean = await bcrypt.compare(
       request.password,
       user.password,
     );
-    if (!user && !isMatch)
-      throw new HttpException('Invalid email or password', 401);
+    if (!isMatch) throw new HttpException('Invalid email or password', 401);
     return this.generateToken(user);
   }
 
-  async generateToken(user: UserResponseDto): Promise<AuthResponseDto> {
+  async generateToken(user: User): Promise<AuthResponse> {
     return {
       token_type: 'Bearer',
-      access_token: await this.jwtService.signAsync(user),
+      access_token: await this.jwtService.signAsync({
+        sub: user.id,
+        email: user.email,
+        role: user.role,
+      }),
     };
   }
 
-  async create(request: RegisterDto): Promise<UserResponseDto> {
-    return await this.prismaService.user.create({
+  async create(request: RegisterDto): Promise<User> {
+    return this.prismaService.user.create({
       data: { ...request, password: await bcrypt.hash(request.password, 10) },
     });
   }
 
-  async get(condition: {
-    id?: string;
-    email?: string;
-  }): Promise<UserResponseDto> {
-    return await this.prismaService.user.findFirst({
-      where: condition,
+  async get(id: string): Promise<UserResponse> {
+    const user: User | null = await this.prismaService.user.findFirst({
+      where: { id: id },
     });
+    if (!user) throw new HttpException('User does not exist', 404);
+    return new UserResponse(user);
   }
 
-  async update(id: string, request: UpdateUserDto): Promise<UserResponseDto> {
-    const user: UserResponseDto = await this.get({ email: request.email });
-    if (user) throw new HttpException('Email already exist', 409);
-    return await this.prismaService.user.update({
-      where: { id: id },
-      data: request,
-    });
+  async update(id: string, request: UpdateUserDto): Promise<UserResponse> {
+    if (request.email) {
+      const existing: User | null = await this.prismaService.user.findFirst({
+        where: { email: request.email },
+      });
+      if (existing && existing.id !== id)
+        throw new HttpException('Email already exist', 409);
+    }
+    if (request.password)
+      request.password = await bcrypt.hash(request.password, 10);
+    return new UserResponse(
+      await this.prismaService.user.update({
+        where: { id: id },
+        data: request,
+      }),
+    );
   }
 
   async delete(id: string): Promise<{ message: string }> {
-    const user: UserResponseDto = await this.get({ id: id });
-    if (!user) throw new HttpException('User does not exist', 409);
+    await this.get(id);
     await this.prismaService.user.delete({
       where: { id: id },
     });
