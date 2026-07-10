@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -6,16 +7,18 @@ import {
   HttpStatus,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import {
-  AuthResponseDto,
+  AuthResponse,
   LoginDto,
   RegisterDto,
   UpdateUserDto,
-  UserResponseDto,
+  UserResponse,
 } from './dto/user.dto';
-import request from 'supertest';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 @Controller('/api/users')
 export class UserController {
@@ -23,31 +26,39 @@ export class UserController {
 
   @Post('/register')
   @HttpCode(HttpStatus.CREATED)
-  async register(request: RegisterDto): Promise<AuthResponseDto> {
+  async register(@Body() request: RegisterDto): Promise<AuthResponse> {
     return await this.usersService.register(request);
   }
 
   @Post('/login')
   @HttpCode(HttpStatus.OK)
-  async login(request: LoginDto): Promise<AuthResponseDto> {
+  async login(@Body() request: LoginDto): Promise<AuthResponse> {
     return await this.usersService.login(request);
   }
 
   @Get('/me')
   @HttpCode(HttpStatus.OK)
-  async get(request: any): Promise<UserResponseDto> {
-    return await this.usersService.get({ id: request.id });
+  @UseGuards(JwtAuthGuard)
+  async get(@CurrentUser() user: UserResponse): Promise<UserResponse> {
+    return await this.usersService.get(user.id);
   }
 
   @Patch('/me')
   @HttpCode(HttpStatus.OK)
-  async update(id: string, request: UpdateUserDto): Promise<UserResponseDto> {
-    return await this.usersService.update(id, request);
+  @UseGuards(JwtAuthGuard)
+  async update(
+    @CurrentUser() user: UserResponse,
+    @Body() request: UpdateUserDto,
+  ): Promise<UserResponse> {
+    return await this.usersService.update(user.id, request);
   }
 
   @Delete('/me')
   @HttpCode(HttpStatus.OK)
-  async delete(id: string): Promise<{ message: string }> {
-    return await this.usersService.delete(id);
+  @UseGuards(JwtAuthGuard)
+  async delete(
+    @CurrentUser() user: UserResponse,
+  ): Promise<{ message: string }> {
+    return await this.usersService.delete(user.id);
   }
 }
