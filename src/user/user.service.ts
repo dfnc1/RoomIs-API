@@ -39,7 +39,7 @@ export class UserService {
     return this.generateToken(user);
   }
 
-  async generateToken(user: User): Promise<AuthResponse> {
+  private async generateToken(user: User): Promise<AuthResponse> {
     return {
       token_type: 'Bearer',
       access_token: await this.jwtService.signAsync({
@@ -50,7 +50,7 @@ export class UserService {
     };
   }
 
-  async create(request: RegisterDto): Promise<User> {
+  private async create(request: RegisterDto): Promise<User> {
     return this.prismaService.user.create({
       data: { ...request, password: await bcrypt.hash(request.password, 10) },
     });
