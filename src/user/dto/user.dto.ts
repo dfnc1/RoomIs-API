@@ -1,6 +1,7 @@
 import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 import { Exclude, Transform } from 'class-transformer';
 import { PartialType, PickType } from '@nestjs/mapped-types';
+import { Role } from '../../../generated/prisma/enums';
 
 export class RegisterDto {
   @IsNotEmpty()
@@ -34,7 +35,7 @@ export class UserResponse {
   id: string;
   name: string;
   email: string;
-  role: string;
+  role: Role;
 
   @Transform(({ value }) => value?.toISOString())
   createdAt: Date;
