@@ -10,7 +10,6 @@ import { Asset, Booking, BookingStatus } from '../../generated/prisma/client';
 
 @Injectable()
 export class BookingService {
-  startOfDay: Date = new Date();
   constructor(private prismaService: PrismaService) {}
 
   async create(
@@ -47,10 +46,10 @@ export class BookingService {
     );
   }
 
-  async getHistory(userId: string): Promise<BookingResponse[]> {
+  async getHistory(user: UserResponse): Promise<BookingResponse[]> {
     const booking: Booking[] | null = await this.prismaService.booking.findMany(
       {
-        where: { userId: userId },
+        where: { userId: user.id },
       },
     );
     if (!booking) throw new HttpException('Booking not found', 404);
