@@ -7,6 +7,7 @@ import {
 } from './dto/booking.dto';
 import { UserResponse } from '../user/dto/user.dto';
 import { Asset, Booking, BookingStatus } from '../../generated/prisma/client';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class BookingService {
@@ -114,5 +115,16 @@ export class BookingService {
     endOfDay.setUTCHours(23, 59, 59, 999);
 
     return { startOfDay, endOfDay };
+  }
+
+  @Cron(CronExpression.EVERY_10_MINUTES)
+  private async handleCompletedBooking(): Promise<void> {
+    await this.prismaService.booking.updateMany({
+      where: {
+        status: BookingStatus.APPROVED,
+        endTime: { lt: new Date() },
+      },
+      data: { status: BookingStatus.COMPLETED },
+    });
   }
 }
