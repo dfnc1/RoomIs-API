@@ -5,6 +5,7 @@ import {
   ConsoleLogger,
   ValidationPipe,
 } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -12,6 +13,19 @@ async function bootstrap() {
       json: true,
     }),
   });
+
+  const config = new DocumentBuilder()
+    .setTitle('RoomIs API')
+    .setDescription('API for rent room')
+    .addTag('User')
+    .addTag('Asset')
+    .addTag('Booking')
+    .addBearerAuth()
+    .build();
+
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('/api/docs', app, documentFactory);
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
