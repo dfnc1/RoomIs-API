@@ -17,9 +17,11 @@ import { UserResponse } from '../user/dto/user.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('/api/bookings')
 @UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth()
 export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
 

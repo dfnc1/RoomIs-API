@@ -19,6 +19,7 @@ import {
 } from './dto/user.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('/api/users')
 export class UserController {
@@ -39,6 +40,7 @@ export class UserController {
   @Get('/me')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   async get(@CurrentUser() user: UserResponse): Promise<UserResponse> {
     return await this.usersService.get(user.id);
   }
@@ -46,6 +48,7 @@ export class UserController {
   @Patch('/me')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   async update(
     @CurrentUser() user: UserResponse,
     @Body() request: UpdateUserDto,
@@ -56,6 +59,7 @@ export class UserController {
   @Delete('/me')
   @HttpCode(HttpStatus.OK)
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   async delete(
     @CurrentUser() user: UserResponse,
   ): Promise<{ message: string }> {

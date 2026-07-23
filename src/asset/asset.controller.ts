@@ -15,9 +15,11 @@ import { AssetResponse, CreateAssetDto, UpdateAssetDto } from './dto/asset.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { ROLE, Roles } from '../auth/decorators/roles.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('/api/assets')
 @UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth()
 export class AssetController {
   constructor(private readonly assetService: AssetService) {}
 
