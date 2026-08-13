@@ -2,6 +2,8 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Patch,
   Post,
@@ -18,6 +20,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { ROLE, Roles } from '../auth/decorators/roles.decorator';
 
 @Controller('/api/bookings')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -26,6 +29,7 @@ export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
 
   @Post()
+  @HttpCode(HttpStatus.CREATED)
   async create(
     @CurrentUser() user: UserResponse,
     @Body() request: CreateBookingDto,
@@ -34,6 +38,7 @@ export class BookingController {
   }
 
   @Get('/history')
+  @HttpCode(HttpStatus.OK)
   async getHistory(
     @CurrentUser() user: UserResponse,
   ): Promise<BookingResponse[]> {
@@ -41,16 +46,20 @@ export class BookingController {
   }
 
   @Get('/calendar')
+  @HttpCode(HttpStatus.OK)
   async getCalendar(): Promise<BookingResponse[]> {
     return await this.bookingService.getCalendar();
   }
 
   @Get('/pending')
+  @HttpCode(HttpStatus.OK)
   async getPending(): Promise<BookingResponse[]> {
     return await this.bookingService.getPending();
   }
 
-  @Patch('/:id')
+  @Patch('/:id/status')
+  @HttpCode(HttpStatus.OK)
+  @Roles([ROLE.ADMIN])
   async update(
     @Param('id') bookingId: string,
     @Body() request: UpdateBookingDto,
