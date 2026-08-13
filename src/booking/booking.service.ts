@@ -97,7 +97,7 @@ export class BookingService {
     });
     if (!booking) throw new HttpException('Booking not found', 404);
     if (request.status === BookingStatus.REJECTED && !request.rejectionReason)
-      throw new HttpException('Asset not found', 404);
+      throw new HttpException('Rejection reason is required', 400);
     return new BookingResponse(
       await this.prismaService.booking.update({
         where: { id: bookingId },
