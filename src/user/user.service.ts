@@ -43,7 +43,7 @@ export class UserService {
     return {
       token_type: 'Bearer',
       access_token: await this.jwtService.signAsync({
-        sub: user.id,
+        id: user.id,
         email: user.email,
         role: user.role,
       }),
