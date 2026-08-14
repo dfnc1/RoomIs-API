@@ -61,12 +61,11 @@ Response (401 Unauthorized):
 {
   "message": "Invalid email or password"
 }
-
 ```
 
 - ### Get User
 
-EndPoint : GET /api/users/me
+Endpoint : GET /api/users/me
 
 Authentication : Bearer JWT
 
@@ -78,37 +77,52 @@ Response (200 OK):
   "email": "example@gmail.com",
   "name": "your name",
   "role": "MAHASISWA",
-  "createdAt": "2026-07-01T08:00:00Z"
+  "createdAt": "2026-07-01T08:00:00Z",
+  "updatedAt": "2026-07-01T09:00:00Z"
+}
+```
+
+Response (401 Unauthorized):
+
+```json
+{
+  "message": "Unauthorized"
 }
 ```
 
 - ### Update User
 
-EndPoint : PATCH /api/users/me
+Endpoint : PATCH /api/users/me
 
 Authentication : Bearer JWT
 
+> Note: all fields are optional, send only what needs to be updated.
+
 Request:
+
 ```json
 {
-  "name": "new name", //optional
-  "email": "newemail@gmail.com", //optional
-  "password": "newpassword" //optional
+  "name": "new name",
+  "email": "newemail@gmail.com",
+  "password": "newpassword"
 }
 ```
 
 Response (200 OK):
+
 ```json
 {
   "id": "uuid",
   "email": "newemail@gmail.com",
   "name": "new name",
   "role": "MAHASISWA",
+  "createdAt": "2026-07-01T08:00:00Z",
   "updatedAt": "2026-07-01T09:00:00Z"
 }
 ```
 
 Response (409 Conflict):
+
 ```json
 {
   "message": "Email already registered"
@@ -117,16 +131,19 @@ Response (409 Conflict):
 
 - ### Delete User
 
-EndPoint : DELETE /api/users/me
+Endpoint : DELETE /api/users/me
 
 Authentication : Bearer JWT
 
 Response (200 OK):
+
 ```json
 {
   "message": "Account deleted successfully"
 }
 ```
+
+---
 
 ## Asset
 
@@ -136,7 +153,7 @@ Endpoint : GET /api/assets
 
 Authentication : Bearer JWT
 
-response (200 OK):
+Response (200 OK):
 
 ```json
 [
@@ -144,7 +161,9 @@ response (200 OK):
     "id": "uuid",
     "name": "Lab Computer A",
     "description": "Air-conditioned room, capacity 40 people",
-    "category": "ROOM"
+    "category": "ROOM",
+    "createdAt": "2026-07-01T08:00:00Z",
+    "updatedAt": "2026-07-01T09:00:00Z"
   }
 ]
 ```
@@ -162,7 +181,9 @@ Response (200 OK):
   "id": "uuid",
   "name": "Lab Komputer A",
   "description": "Air-conditioned room, capacity 40 people",
-  "category": "ROOM"
+  "category": "ROOM",
+  "createdAt": "2026-07-01T08:00:00Z",
+  "updatedAt": "2026-07-01T09:00:00Z"
 }
 ```
 
@@ -174,11 +195,11 @@ Response (404 Not Found):
 }
 ```
 
-### Create Asset
+- ### Create Asset
 
 Endpoint : POST /api/assets
 
-Authentication : Bearer JWT
+Authentication : Bearer JWT (ADMIN only)
 
 Request:
 
@@ -197,23 +218,27 @@ Response (201 Created):
   "id": "uuid",
   "name": "Proyektor Sony",
   "description": "Portable projector",
-  "category": "ITEM"
+  "category": "ITEM",
+  "createdAt": "2026-07-01T08:00:00Z",
+  "updatedAt": "2026-07-01T09:00:00Z"
 }
 ```
 
-### Update Asset
+- ### Update Asset
 
-Endpoint : PUT /api/assets/:id
+Endpoint : PATCH /api/assets/:id
 
-Authentication : Bearer JWT
+Authentication : Bearer JWT (ADMIN only)
+
+> Note: all fields are optional, send only what needs to be updated.
 
 Request:
 
 ```json
 {
-  "name": "Proyektor Sony Updated", //optional
-  "description": "Portable HD projector", //optional
-  "category": "ITEM"  //optional
+  "name": "Proyektor Sony Updated",
+  "description": "Portable HD projector",
+  "category": "ITEM"
 }
 ```
 
@@ -224,7 +249,9 @@ Response (200 OK):
   "id": "uuid",
   "name": "Proyektor Sony Updated",
   "description": "Portable HD projector",
-  "category": "ITEM"
+  "category": "ITEM",
+  "createdAt": "2026-07-01T08:00:00Z",
+  "updatedAt": "2026-07-01T09:00:00Z"
 }
 ```
 
@@ -236,11 +263,11 @@ Response (404 Not Found):
 }
 ```
 
-### Delete Asset
+- ### Delete Asset
 
 Endpoint : DELETE /api/assets/:id
 
-Authentication : Bearer JWT
+Authentication : Bearer JWT (ADMIN only)
 
 Response (200 OK):
 
@@ -258,134 +285,183 @@ Response (404 Not Found):
 }
 ```
 
+---
+
 ## Booking
 
-### Create Booking
+- ### Create Booking
+
 Endpoint : POST /api/bookings
 
 Authentication : Bearer JWT
 
 Request:
+
 ```json
 {
-"assetId": "uuid",
-"startTime": "2026-07-01T08:00:00Z",
-"endTime": "2026-07-01T10:00:00Z"
+  "assetId": "uuid",
+  "startTime": "2026-07-01T08:00:00Z",
+  "endTime": "2026-07-01T10:00:00Z"
 }
 ```
 
 Response (201 Created):
+
 ```json
 {
-"id": "uuid",
-"assetId": "uuid",
-"userId": "uuid",
-"startTime": "2026-07-01T08:00:00Z",
-"endTime": "2026-07-01T10:00:00Z",
-"status": "PENDING"
+  "id": "uuid",
+  "assetId": "uuid",
+  "userId": "uuid",
+  "startTime": "2026-07-01T08:00:00Z",
+  "endTime": "2026-07-01T10:00:00Z",
+  "status": "PENDING",
+  "rejectionReason": null,
+  "createdAt": "2026-07-01T08:00:00Z",
+  "updatedAt": "2026-07-01T09:00:00Z"
 }
 ```
 
 Response (400 Bad Request):
+
 ```json
 {
-"message": "Schedule conflicts with an already approved booking"
+  "message": "Schedule conflicts with an already approved booking"
 }
 ```
 
+Response (404 Not Found):
 
-### Get Booking History
+```json
+{
+  "message": "Asset not found"
+}
+```
+
+- ### Get Booking History
 
 Endpoint : GET /api/bookings/history
 
 Authentication : Bearer JWT
 
 Response (200 OK):
+
 ```json
 [
-{
-"id": "uuid",
-"assetId": "uuid",
-"startTime": "2026-07-01T08:00:00Z",
-"endTime": "2026-07-01T10:00:00Z",
-"status": "APPROVED"
-}
+  {
+    "id": "uuid",
+    "assetId": "uuid",
+    "userId": "uuid",
+    "startTime": "2026-07-01T08:00:00Z",
+    "endTime": "2026-07-01T10:00:00Z",
+    "status": "APPROVED",
+    "rejectionReason": null,
+    "createdAt": "2026-07-01T08:00:00Z",
+    "updatedAt": "2026-07-01T09:00:00Z"
+  }
 ]
 ```
 
-### Get Booking Calendar
+- ### Get Booking Calendar
 
 Endpoint : GET /api/bookings/calendar
 
 Authentication : Bearer JWT
 
 Response (200 OK):
+
 ```json
 [
-{
-"id": "uuid",
-"assetId": "uuid",
-"startTime": "2026-07-01T08:00:00Z",
-"endTime": "2026-07-01T10:00:00Z",
-"status": "APPROVED"
-}
+  {
+    "id": "uuid",
+    "assetId": "uuid",
+    "userId": "uuid",
+    "startTime": "2026-07-01T08:00:00Z",
+    "endTime": "2026-07-01T10:00:00Z",
+    "status": "APPROVED",
+    "rejectionReason": null,
+    "createdAt": "2026-07-01T08:00:00Z",
+    "updatedAt": "2026-07-01T09:00:00Z"
+  }
 ]
 ```
 
-
-### Get Pending Bookings
+- ### Get Pending Bookings
 
 Endpoint : GET /api/bookings/pending
 
-Authentication : Bearer JWT
+Authentication : Bearer JWT (ADMIN only)
 
 Response (200 OK):
+
 ```json
 [
-{
-"id": "uuid",
-"userId": "uuid",
-"assetId": "uuid",
-"startTime": "2026-07-01T08:00:00Z",
-"endTime": "2026-07-01T10:00:00Z",
-"status": "PENDING"
-}
+  {
+    "id": "uuid",
+    "userId": "uuid",
+    "assetId": "uuid",
+    "startTime": "2026-07-01T08:00:00Z",
+    "endTime": "2026-07-01T10:00:00Z",
+    "status": "PENDING",
+    "rejectionReason": null,
+    "createdAt": "2026-07-01T08:00:00Z",
+    "updatedAt": "2026-07-01T09:00:00Z"
+  }
 ]
 ```
 
+- ### Update Booking Status
 
-### Update Booking Status
 Endpoint : PATCH /api/bookings/:id/status
 
-Authentication : Bearer JWT
+Authentication : Bearer JWT (ADMIN only)
 
-Request:
+Request (approve):
+
 ```json
 {
-"status": "APPROVED"
+  "status": "APPROVED"
 }
 ```
 
 Request (reject):
+
 ```json
 {
-"status": "REJECTED",
-"rejectionReason": "Room under maintenance" //optional
+  "status": "REJECTED",
+  "rejectionReason": "Room under maintenance"
 }
 ```
 
+> Note: rejectionReason is required when status is REJECTED.
+
 Response (200 OK):
+
 ```json
 {
-"id": "uuid",
-"status": "APPROVED",
-"rejectionReason": null
+  "id": "uuid",
+  "userId": "uuid",
+  "assetId": "uuid",
+  "startTime": "2026-07-01T08:00:00Z",
+  "endTime": "2026-07-01T10:00:00Z",
+  "status": "APPROVED",
+  "rejectionReason": null,
+  "createdAt": "2026-07-01T08:00:00Z",
+  "updatedAt": "2026-07-01T09:00:00Z"
+}
+```
+
+Response (400 Bad Request):
+
+```json
+{
+  "message": "Rejection reason is required"
 }
 ```
 
 Response (404 Not Found):
+
 ```json
 {
-"message": "Booking not found"
+  "message": "Booking not found"
 }
 ```
